@@ -16,6 +16,13 @@ public class SimpleAudioPlayer {
     private AudioInputStream audioInputStream;
     private int currentFile;
 
+    /**
+     * Constructor for a Musicplayer Instance
+     * @param filePaths List of Filepaths where music is stored
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public SimpleAudioPlayer(List filePaths) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         currentFile = 0;
         songMap = fillSongList(filePaths);
@@ -52,7 +59,11 @@ public class SimpleAudioPlayer {
     }
 
 
-
+    /**
+     * filling an ArrayList into a HashMap for better access within the player
+     * @param songList list of Songs to convert into Map
+     * @return Map of Songs
+     */
     private Map<Integer, String> fillSongList(List songList){
         Map<Integer, String> songMap = new HashMap<>();
         for(int i = 0; i < songList.size(); i++){
@@ -95,6 +106,12 @@ public class SimpleAudioPlayer {
         }
     }
 
+    /**
+     * skips the current song by increasing the currentfile variable and reseting the AudioStream
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public void skip() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(currentFile < songMap.size()-1){
             clip.close();
@@ -104,6 +121,12 @@ public class SimpleAudioPlayer {
 
     }
 
+    /**
+     * play the previous song again by decreasing currentfile by 1 and reseting the AudioStream
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public void previous() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(currentFile > 0){
             clip.stop();
@@ -113,11 +136,17 @@ public class SimpleAudioPlayer {
         }
     }
 
+    /**
+     * play the song at the current value of currentfile and parse the status PLAY
+     */
     public void play(){
         clip.start();
         status = Status.PLAY;
     }
 
+    /**
+     * pause the song at the current value of currentfile and parse the status STOP
+     */
     public void pause(){
         if(status.equals(Status.STOP)){
             System.out.println("Audio is already paused.");
@@ -130,6 +159,12 @@ public class SimpleAudioPlayer {
 
     }
 
+    /**
+     * resume the song at the current value of currentfile and parse the status PLAY
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public void resumeAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(status.equals(Status.PLAY)){
             System.out.println("Audio is already playing");
@@ -143,6 +178,12 @@ public class SimpleAudioPlayer {
         this.play();
     }
 
+    /**
+     * restart the current played song by reseting the AudioStream
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public void restart() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         clip.stop();
         clip.close();
@@ -151,12 +192,22 @@ public class SimpleAudioPlayer {
         this.play();
     }
 
+    /**
+     * stop the playing of the song - Ends the execution of the program
+     */
     public void stop(){
         currentFrame = 0L;
         clip.stop();
         clip.close();
     }
 
+    /**
+     * jump to the parsed Milisecond value of the current song
+     * @param milisec value to jump to
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     public void jump(long milisec) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if( milisec > 0 && milisec < clip.getMicrosecondLength()){
             clip.stop();
@@ -170,9 +221,9 @@ public class SimpleAudioPlayer {
 
     /**
      * resets the current Audiostream, by opening the currentfile and starting the clip
-     * @throws UnsupportedAudioFileException
-     * @throws IOException
-     * @throws LineUnavailableException
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
     private void resetAudioStream() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         audioInputStream = AudioSystem.getAudioInputStream(new File(songMap.get(currentFile)).getAbsoluteFile());
@@ -180,6 +231,12 @@ public class SimpleAudioPlayer {
         clip.start();
     }
 
+    /**
+     * pick a random number within the Bounds of the songmapsize and play the song
+     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
+     * @throws IOException misc Exception like FileNotFound
+     * @throws LineUnavailableException Exceptionn for when the line is unavailable
+     */
     private void random() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
         if(rn == null) rn = new Random();//check if randomizer already exists
 
