@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class SimpleAudioPlayer {
+public class SimpleAudioPlayer implements IAudioPlayer {
 
     private long currentFrame;
     private Clip clip;
@@ -23,7 +23,7 @@ public class SimpleAudioPlayer {
      * @throws IOException misc Exception like FileNotFound
      * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public SimpleAudioPlayer(List filePaths) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    public SimpleAudioPlayer(List filePaths) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         currentFile = 0;
         songMap = fillSongList(filePaths);
 
@@ -47,12 +47,8 @@ public class SimpleAudioPlayer {
             public void update(LineEvent event) {
                 currentFrame = clip.getMicrosecondPosition();
                 if (event.getType() == LineEvent.Type.STOP && currentFrame == clip.getMicrosecondLength()) {
-                    try {
-                        currentFile++;
-                        restart();
-                    } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-                        e.printStackTrace();
-                    }
+                    currentFile++;
+                    restart();
                 }
             }
         });
@@ -77,11 +73,8 @@ public class SimpleAudioPlayer {
      * simple interface for interaction with the song.
      * TODO : Replace by a GUI
      * @param choice chosen option
-     * @throws UnsupportedAudioFileException Filetype was not supported by the player
-     * @throws LineUnavailableException Line was unavailable when the choice was made
-     * @throws IOException misc. Exceptions like FileNotFound
      */
-    public void goToChoice(int choice) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void goToChoice(int choice){
         switch (choice){
             case 1: pause();
             break;
@@ -108,31 +101,41 @@ public class SimpleAudioPlayer {
 
     /**
      * skips the current song by increasing the currentfile variable and reseting the AudioStream
-     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
-     * @throws IOException misc Exception like FileNotFound
-     * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public void skip() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void skip(){
         if(currentFile < songMap.size()-1){
             clip.close();
             currentFile++;
-            resetAudioStream();
+            try {
+                resetAudioStream();
+            } catch (UnsupportedAudioFileException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
 
     /**
      * play the previous song again by decreasing currentfile by 1 and reseting the AudioStream
-     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
-     * @throws IOException misc Exception like FileNotFound
-     * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public void previous() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void previous(){
         if(currentFile > 0){
             clip.stop();
             clip.close();
             currentFile--;
-            resetAudioStream();
+            try {
+                resetAudioStream();
+            } catch (UnsupportedAudioFileException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -140,6 +143,7 @@ public class SimpleAudioPlayer {
      * play the song at the current value of currentfile and parse the status PLAY
      */
     public void play(){
+        clip.setMicrosecondPosition(currentFrame);
         clip.start();
         status = Status.PLAY;
     }
@@ -161,11 +165,8 @@ public class SimpleAudioPlayer {
 
     /**
      * resume the song at the current value of currentfile and parse the status PLAY
-     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
-     * @throws IOException misc Exception like FileNotFound
-     * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public void resumeAudio() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void resumeAudio(){
         if(status.equals(Status.PLAY)){
             System.out.println("Audio is already playing");
             return;
@@ -173,7 +174,15 @@ public class SimpleAudioPlayer {
 
         status = Status.PLAY;
         clip.close();
-        resetAudioStream();
+        try {
+            resetAudioStream();
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
         clip.setMicrosecondPosition(currentFrame);
         this.play();
     }
@@ -184,11 +193,19 @@ public class SimpleAudioPlayer {
      * @throws IOException misc Exception like FileNotFound
      * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public void restart() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void restart(){
         clip.stop();
-        clip.close();
-        resetAudioStream();
         clip.setMicrosecondPosition(0);
+        clip.close();
+        try {
+            resetAudioStream();
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
         this.play();
     }
 
@@ -204,15 +221,20 @@ public class SimpleAudioPlayer {
     /**
      * jump to the parsed Milisecond value of the current song
      * @param milisec value to jump to
-     * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
-     * @throws IOException misc Exception like FileNotFound
-     * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public void jump(long milisec) throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    public void jump(long milisec){
         if( milisec > 0 && milisec < clip.getMicrosecondLength()){
             clip.stop();
             clip.close();
-            resetAudioStream();
+            try {
+                resetAudioStream();
+            } catch (UnsupportedAudioFileException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (LineUnavailableException e) {
+                throw new RuntimeException(e);
+            }
             currentFrame = milisec;
             clip.setMicrosecondPosition(milisec);
             this.play();
@@ -237,13 +259,22 @@ public class SimpleAudioPlayer {
      * @throws IOException misc Exception like FileNotFound
      * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    private void random() throws UnsupportedAudioFileException, LineUnavailableException, IOException {
+    @Override
+    public void random(){
         if(rn == null) rn = new Random();//check if randomizer already exists
 
         clip.stop();
         clip.close();
         currentFile = rn.nextInt(songMap.size());
-        resetAudioStream();
+        try {
+            resetAudioStream();
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (LineUnavailableException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

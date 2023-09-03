@@ -14,10 +14,14 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
+        //IAudioPlayer currentPlayer = new SimpleAudioPlayer();
+
+
+
         List<String> songList = new ArrayList<>();
         DirectoryStream<Path> directoryStream = null;
         try {
-            directoryStream = Files.newDirectoryStream(Paths.get("C:\\Users\\danie\\Desktop\\Musik-wav"));
+            directoryStream = Files.newDirectoryStream(Paths.get("C:\\Users\\Daniel\\Desktop\\Musik - wav"));
             for (Path path: directoryStream) {
                songList.add(path.toString());
             }
@@ -29,7 +33,7 @@ public class Main {
 
 
         try{
-            SimpleAudioPlayer simpleAudioPlayer = new SimpleAudioPlayer(songList);
+            IAudioPlayer simpleAudioPlayer = new SimpleAudioPlayer(songList);
 
             simpleAudioPlayer.play();
             Scanner sc = new Scanner(System.in);
