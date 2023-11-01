@@ -15,11 +15,11 @@ public class Main {
 
     public static void main(String[] args) {
         //IAudioPlayer currentPlayer = new SimpleAudioPlayer();
-
-
-
         List<String> songList = new ArrayList<>();
         DirectoryStream<Path> directoryStream = null;
+
+        Thread printingHook = new Thread(()->System.out.println("Shutting down")) ;
+        Runtime.getRuntime().addShutdownHook(printingHook);
         try {
             directoryStream = Files.newDirectoryStream(Paths.get("C:\\Users\\Daniel\\Desktop\\Musik - wav"));
             for (Path path: directoryStream) {
@@ -32,7 +32,7 @@ public class Main {
         }
 
         try{
-            IAudioPlayer simpleAudioPlayer = new SimpleAudioPlayer(songList);
+            IAudioPlayer simpleAudioPlayer = new WaveAudioPlayer(songList);
 
             simpleAudioPlayer.play();
             Scanner sc = new Scanner(System.in);
@@ -59,7 +59,5 @@ public class Main {
         } catch (IOException ioException) {
             ioException.printStackTrace();
         }
-
-
     }
 }

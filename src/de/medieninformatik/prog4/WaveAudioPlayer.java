@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
-public class SimpleAudioPlayer implements IAudioPlayer {
+public class WaveAudioPlayer implements IAudioPlayer {
 
     private long currentFrame;
     private Clip clip;
@@ -23,7 +23,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
      * @throws IOException misc Exception like FileNotFound
      * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    public SimpleAudioPlayer(List filePaths) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
+    public WaveAudioPlayer(List filePaths) throws UnsupportedAudioFileException, IOException, LineUnavailableException{
         currentFile = 0;
         songMap = fillSongList(filePaths);
 

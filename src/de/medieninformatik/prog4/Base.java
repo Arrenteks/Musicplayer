@@ -12,4 +12,8 @@ public class Base {
         String ending = path.substring(lastIndex);
         return ending;
     }
+
+    public static void writeObject(Object o){
+
+    }
 }
