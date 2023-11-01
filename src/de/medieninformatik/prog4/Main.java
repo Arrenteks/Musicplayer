@@ -31,7 +31,6 @@ public class Main {
             e.printStackTrace();
         }
 
-
         try{
             IAudioPlayer simpleAudioPlayer = new SimpleAudioPlayer(songList);
 
@@ -52,10 +51,6 @@ public class Main {
                 if(input == 4) break;
             }
             sc.close();
-
-
-
-
 
         } catch (UnsupportedAudioFileException e) {
             e.printStackTrace();

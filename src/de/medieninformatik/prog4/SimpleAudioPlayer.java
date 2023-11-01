@@ -31,27 +31,14 @@ public class SimpleAudioPlayer implements IAudioPlayer {
 
         clip = AudioSystem.getClip();
 
-        addLineListener();
-        clip.open(audioInputStream);
-
-
-    }
-
-    /**
-     * Adds Line Listener to the File. Checks, when the clip is paused if the end of file was reached. If that is the case
-     * the player skips to the next File and restarts the clip.
-     */
-    private void addLineListener(){
-        clip.addLineListener(new LineListener() {
-            @Override
-            public void update(LineEvent event) {
-                currentFrame = clip.getMicrosecondPosition();
-                if (event.getType() == LineEvent.Type.STOP && currentFrame == clip.getMicrosecondLength()) {
-                    currentFile++;
-                    restart();
-                }
+        clip.addLineListener(evt -> {
+            currentFrame = clip.getMicrosecondPosition();
+            if (evt.getType() == LineEvent.Type.STOP && currentFrame == clip.getMicrosecondLength()) {
+                currentFile++;
+                restart();
             }
         });
+        clip.open(audioInputStream);
     }
 
 
@@ -107,7 +94,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
             clip.close();
             currentFile++;
             try {
-                resetAudioStream();
+                resetAudioStream(0);
             } catch (UnsupportedAudioFileException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -128,7 +115,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
             clip.close();
             currentFile--;
             try {
-                resetAudioStream();
+                resetAudioStream(0);
             } catch (UnsupportedAudioFileException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -143,7 +130,6 @@ public class SimpleAudioPlayer implements IAudioPlayer {
      * play the song at the current value of currentfile and parse the status PLAY
      */
     public void play(){
-        clip.setMicrosecondPosition(currentFrame);
         clip.start();
         status = Status.PLAY;
     }
@@ -160,7 +146,6 @@ public class SimpleAudioPlayer implements IAudioPlayer {
         this.currentFrame = this.clip.getMicrosecondPosition();
         clip.stop();
         clip.close();
-
     }
 
     /**
@@ -175,7 +160,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
         status = Status.PLAY;
         clip.close();
         try {
-            resetAudioStream();
+            resetAudioStream(currentFrame);
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -183,7 +168,6 @@ public class SimpleAudioPlayer implements IAudioPlayer {
         } catch (LineUnavailableException e) {
             throw new RuntimeException(e);
         }
-        clip.setMicrosecondPosition(currentFrame);
         this.play();
     }
 
@@ -195,10 +179,9 @@ public class SimpleAudioPlayer implements IAudioPlayer {
      */
     public void restart(){
         clip.stop();
-        clip.setMicrosecondPosition(0);
         clip.close();
         try {
-            resetAudioStream();
+            resetAudioStream(0);
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
@@ -213,9 +196,9 @@ public class SimpleAudioPlayer implements IAudioPlayer {
      * stop the playing of the song - Ends the execution of the program
      */
     public void stop(){
-        currentFrame = 0L;
         clip.stop();
         clip.close();
+        currentFrame = 0L;
     }
 
     /**
@@ -227,7 +210,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
             clip.stop();
             clip.close();
             try {
-                resetAudioStream();
+                resetAudioStream(milisec);
             } catch (UnsupportedAudioFileException e) {
                 throw new RuntimeException(e);
             } catch (IOException e) {
@@ -235,21 +218,20 @@ public class SimpleAudioPlayer implements IAudioPlayer {
             } catch (LineUnavailableException e) {
                 throw new RuntimeException(e);
             }
-            currentFrame = milisec;
-            clip.setMicrosecondPosition(milisec);
             this.play();
         }
     }
 
     /**
-     * resets the current Audiostream, by opening the currentfile and starting the clip
+     * resets the current Audiostream at a defined point in the stream
      * @throws UnsupportedAudioFileException Exception for when the Fileformat is not supported
      * @throws IOException misc Exception like FileNotFound
      * @throws LineUnavailableException Exceptionn for when the line is unavailable
      */
-    private void resetAudioStream() throws UnsupportedAudioFileException, IOException, LineUnavailableException {
+    private void resetAudioStream(long frame) throws UnsupportedAudioFileException, IOException, LineUnavailableException {
         audioInputStream = AudioSystem.getAudioInputStream(new File(songMap.get(currentFile)).getAbsoluteFile());
         clip.open(audioInputStream);
+        clip.setMicrosecondPosition(frame);
         clip.start();
     }
 
@@ -267,7 +249,7 @@ public class SimpleAudioPlayer implements IAudioPlayer {
         clip.close();
         currentFile = rn.nextInt(songMap.size());
         try {
-            resetAudioStream();
+            resetAudioStream(0);
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
