@@ -3,8 +3,6 @@ package de.medieninformatik.prog4;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -14,28 +12,24 @@ import java.util.Scanner;
 public class Main {
 
     public static void main(String[] args) {
-        //IAudioPlayer currentPlayer = new SimpleAudioPlayer();
-        List<String> songList = new ArrayList<>();
-        DirectoryStream<Path> directoryStream = null;
+        List<String> songList = new ArrayList<>();// initialize empty list
+        Scanner sc = new Scanner(System.in);//remove when UI is done
 
-        Thread printingHook = new Thread(()->System.out.println("Shutting down")) ;
-        Runtime.getRuntime().addShutdownHook(printingHook);
-        try {
-            directoryStream = Files.newDirectoryStream(Paths.get("C:\\Users\\Daniel\\Desktop\\Musik - wav"));
-            for (Path path: directoryStream) {
-               songList.add(path.toString());
-            }
-            directoryStream.close();
-        } catch (IOException e) {
-            System.err.println("Der angegebene Pfad konnte nicht gefunden werden");
-            e.printStackTrace();
-        }
+        Thread printingHook = new Thread(()->System.out.println("Shutting down"));// adding serializable functionality for getting previous music
+        Runtime.getRuntime().addShutdownHook(printingHook);//what should be done, when program is shutting down
+
 
         try{
-            IAudioPlayer simpleAudioPlayer = new WaveAudioPlayer(songList);
+            while(songList.isEmpty()){
+                System.out.println("Input valid music directory");
+                Path target = Paths.get(sc.nextLine());
+                songList = Base.GetSongList(target);
+            }
 
-            simpleAudioPlayer.play();
-            Scanner sc = new Scanner(System.in);
+            IAudioPlayer audioPlayer= new WaveAudioPlayer(songList);
+            audioPlayer.play();
+
+
 
             while(true){
                 System.out.println("1. pause");
@@ -47,17 +41,13 @@ public class Main {
                 System.out.println("7. revisit the previous song");
                 System.out.println("8. Pick a random song");
                 int input = sc.nextInt();
-                simpleAudioPlayer.goToChoice(input);
+                audioPlayer.goToChoice(input);
                 if(input == 4) break;
             }
             sc.close();
 
-        } catch (UnsupportedAudioFileException e) {
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
             e.printStackTrace();
-        } catch (LineUnavailableException e) {
-            e.printStackTrace();
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
         }
     }
 }
