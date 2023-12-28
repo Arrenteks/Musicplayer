@@ -1,6 +1,8 @@
 package de.medieninformatik.prog4;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -53,14 +55,31 @@ public class Base {
         return result;
     }
 
+    /**
+     * checks if the Fileformat is supported by the music player
+     * @param fileEnding Ending of the File
+     * @return true if File supported, else false
+     */
     public static boolean FileSupported(String fileEnding){
         switch(fileEnding){
-            case ".wav": return true;
+            case ".wav", ".aiff", ".au": return true;
             default: return false;
         }
     }
 
     public static void writeObject(Object o){
+        FileOutputStream fileOutputStream;
+        ObjectOutputStream objectOutputStream;
+
+        try {
+            fileOutputStream = new FileOutputStream("lastsong.txt");
+            objectOutputStream = new ObjectOutputStream(fileOutputStream);
+            objectOutputStream.writeObject(o);
+            objectOutputStream.flush();
+            objectOutputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 }

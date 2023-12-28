@@ -17,8 +17,6 @@ public class Main {
 
         Thread printingHook = new Thread(()->System.out.println("Shutting down"));// adding serializable functionality for getting previous music
         Runtime.getRuntime().addShutdownHook(printingHook);//what should be done, when program is shutting down
-
-
         try{
             while(songList.isEmpty()){
                 System.out.println("Input valid music directory");
